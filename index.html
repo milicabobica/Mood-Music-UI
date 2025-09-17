@@ -76,7 +76,7 @@
 </div>
 
 <script>
-    const text = "♫⋆｡ MOOD MUSIC ₊˚♬ ﾟ♪."; //
+    const text = "♫⋆｡ MOOD MUSIC ₊˚♬ ﾟ♪."; //typing effect za naslovot
     const textContain = document.getElementById("title");
     let i=0;
     function typeEffect(){
@@ -94,7 +94,7 @@
                 const responseElem = document.getElementById("response");
                 responseElem.innerHTML = "";
                 const loadingElem = document.getElementById("loading");
-                loadingElem.style.display = "block"; // show loading
+                loadingElem.style.display = "block"; //za bar
 
 
                 try {
@@ -110,7 +110,6 @@
 
                     const lines = playlist.split("\n").filter(line => line.trim() !== "");
 
-                    // Create an ordered list
                     const ol = document.createElement("ol");
                     lines.forEach(line => {
                         const li = document.createElement("li");
@@ -120,7 +119,7 @@
 
                     responseElem.appendChild(ol);
 
-                    // Typing effect
+                    // typing effect za response
                     let i = 0;
                     const interval = setInterval(() => {
                         if (i < lines.length) {
@@ -129,7 +128,7 @@
                         } else {
                             clearInterval(interval);
                         }
-                    }, 30); // 30ms per character, adjust speed
+                    }, 30); 
 
                 } catch (err) {
                     console.error(err);
@@ -139,7 +138,6 @@
             }
 
             function playDummy() {
-                // Simulate playback with a simple progress bar
                 const playerElem = document.getElementById("player");
                 let progress = 0;
                 const progressBar = document.createElement("div");
@@ -174,4 +172,5 @@
             }
 </script>
 </body>
+
 </html>
