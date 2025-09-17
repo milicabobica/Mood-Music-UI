@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mood Music UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!--desktop i mobile version-->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+</head>
+<body>
+<div class="title">
+    <div id="title">
+        <!--    <div>-->
+        <!--    <h1 >♫⋆｡ MOOD MUSIC ₊˚♬ ﾟ♪.</h1></div>-->
+    </div>
+</div>
+<div class="explanation">
+    <div id="1">
+        <h1 >What is Mood Music? </h1>
+        <p>Mood Music is a music app user interface (UI), where AI suggest play
+            playlists based on user emotion input.
+            <br>It involves a clean UI/UX design principles with some indication of
+        AI interaction.</p>
+    </div>
+    <div id="2">
+        <h1>How does it work?</h1>
+        <p>Below, there is text area, where you can put in your emotion.
+            <br>The input can be either a written text,
+        emoji, an emotion, or a song. </p>
+    </div>
+</div>
+<div class="container">
+    <h1>How are you feeling?</h1>
+    <textarea id="emotionInput" placeholder="Enter your mood/emotion... (e.g. I feel sad, happy, excited)"></textarea>
+    <div class="button"><button onclick="getSuggestions()">Get Playlist Suggestions</button></div>
+
+    <div class="loading" id="loading">
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div id="suggestions"></div>
+    <div id="response"></div>
+
+    <div id="player">
+<!--        <p>Now Playing: <span id="songTitle">Nothing yet</span></p>-->
+        <div class="button">
+            <button onclick="playDummy()">▶ Play</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="author-content">
+        <h3>Mila Bozhinoska</h3>
+        <span>Web Designer</span>
+    </div>
+    <div class="social-network">
+        <div class="soial-icons">
+            <span>
+                <a href="https://github.com/milicabobica" target="_blank"><i class="fa fa-github"></i></a>
+            </span>
+            <span>
+                <a href="https://www.linkedin.com/in/mila-bozhinoska-548ab736a/" target="_blank"><i class="fa fa-linkedin"></i></a>
+            </span>
+            <span>
+                <a href="mailto:mila.bozhinoska@students.finki.ukim.mk" title="Email" target="_blank" rel="noopener noreferrer"><i class="fa fa-envelope"></i></a>
+            </span>
+    </div>
+</div>
+</div>
+
+<script>
+    const text = "♫⋆｡ MOOD MUSIC ₊˚♬ ﾟ♪."; //
+    const textContain = document.getElementById("title");
+    let i=0;
+    function typeEffect(){
+        if(i < text.length){
+            textContain.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeEffect,120);
+        }
+    }
+
+    typeEffect();
+
+            async function getSuggestions() {
+                const emotion = document.getElementById("emotionInput").value;
+                const responseElem = document.getElementById("response");
+                responseElem.innerHTML = "";
+                const loadingElem = document.getElementById("loading");
+                loadingElem.style.display = "block"; // show loading
+
+
+                try {
+                    const res = await fetch("http://127.0.0.1:8000/generate", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({emotion: emotion})
+                    });
+
+                    const data = await res.json();
+                    const playlist = data.playlist;
+                    loadingElem.style.display = "none";
+
+                    const lines = playlist.split("\n").filter(line => line.trim() !== "");
+
+                    // Create an ordered list
+                    const ol = document.createElement("ol");
+                    lines.forEach(line => {
+                        const li = document.createElement("li");
+                        li.textContent = line.replace(/^\d+\.\s*/, ""); // strip "1. " if duplicated
+                        ol.appendChild(li);
+                    });
+
+                    responseElem.appendChild(ol);
+
+                    // Typing effect
+                    let i = 0;
+                    const interval = setInterval(() => {
+                        if (i < lines.length) {
+                            responseElem.textContent += lines[i];
+                            i++;
+                        } else {
+                            clearInterval(interval);
+                        }
+                    }, 30); // 30ms per character, adjust speed
+
+                } catch (err) {
+                    console.error(err);
+                    loadingElem.style.display = "none";
+                    responseElem.textContent = "Error";
+                }
+            }
+
+            function playDummy() {
+                // Simulate playback with a simple progress bar
+                const playerElem = document.getElementById("player");
+                let progress = 0;
+                const progressBar = document.createElement("div");
+                progressBar.style.width = "100%";
+                progressBar.style.height = "5px";
+                progressBar.style.background = "#444";
+                progressBar.style.marginTop = "10px";
+                progressBar.style.borderRadius = "5px";
+
+                const innerBar = document.createElement("div");
+                innerBar.style.height = "100%";
+                innerBar.style.width = "0%";
+                innerBar.style.background = "#808800";
+                innerBar.style.borderRadius = "5px";
+                innerBar.style.transition = "width 0.3s";
+
+                progressBar.appendChild(innerBar);
+                playerElem.appendChild(progressBar);
+
+                const interval = setInterval(() => {
+                    progress += 2;
+                    innerBar.style.width = `${progress}%`;
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            playerElem.removeChild(progressBar);
+                            // document.getElementById("songTitle").textContent = "Nothing yet";
+                        }, 500);
+                    }
+                }, 100);
+            }
+</script>
+</body>
+</html>
